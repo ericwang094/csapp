@@ -15,4 +15,18 @@ add_executable(csapp
         my_test.c
         chapter2/homework/2_58.c
         chapter2/homework/2_59.c
-        chapter2/homework/2_60.c)
+        chapter2/homework/2_60.c
+        chapter2/homework/2_61.c
+        chapter2/homework/2_62.c
+        chapter2/homework/2_63.c
+        chapter2/homework/2_64.c
+        chapter2/homework/65.c
+        chapter2/homework/67.c
+        chapter2/homework/66.c
+        chapter2/homework/68.c
+        chapter2/homework/69.c
+        chapter2/homework/70.c
+        chapter2/homework/72.c
+        chapter2/homework/73.c
+        chapter2/homework/74.c
+        chapter2/homework/75.c)
