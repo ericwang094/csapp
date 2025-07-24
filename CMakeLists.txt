@@ -29,4 +29,8 @@ add_executable(csapp
         chapter2/homework/72.c
         chapter2/homework/73.c
         chapter2/homework/74.c
-        chapter2/homework/75.c)
+        chapter2/homework/75.c
+        chapter2/homework/76.c
+        chapter2/homework/77.c
+        chapter2/homework/78.c
+        chapter2/homework/79.c)

@@ -14,6 +14,7 @@
  */
 
 #include <stdint.h>
+#include <stdio.h>
 #if 0
 /*
  * Instructions to Students:
@@ -258,20 +259,13 @@ int negate(int x)
  */
 int isAsciiDigit(int x)
 {
+	int lower_bound = x + ~0x30 + 1;
+	int upper_bound = 0x39 + ~x + 1;
 
-	int result =
-		(x ^ 0x30) &
-		(x ^ 0x31) &
-		(x ^ 0x32) &
-		(x ^ 0x33) &
-		(x ^ 0x34) &
-		(x ^ 0x35) &
-		(x ^ 0x36) &
-		(x ^ 0x37) &
-		(x ^ 0x38) &
-		(x ^ 0x39);
-	return !result;
+	int is_within_lower_bound = !(lower_bound >> 31);
+	int is_within_upper_bound = !(upper_bound >> 31);
 
+	return is_within_lower_bound & is_within_upper_bound;
 }
 
 /*
@@ -283,7 +277,10 @@ int isAsciiDigit(int x)
  */
 int conditional(int x, int y, int z)
 {
-	return z;
+	int is_true = !!(x ^ 0);
+
+	int bench_mark = ~is_true + 1;
+	return (bench_mark & y) | (~bench_mark & z);
 }
 
 /*
@@ -295,7 +292,16 @@ int conditional(int x, int y, int z)
  */
 int isLessOrEqual(int x, int y)
 {
-	return 2;
+	int diff_sign = !!((x >> 31) ^ (y >> 31)); // check if sign same or diff, if diff, diff_sign is 1
+
+	// if x is neg (x >> 31 = 1) and diff_sign is (1), it means y is pos, so overall answer is x < y = 1
+    // if diff sign (1) and x is pos ( x >> 31 = 0), it means y is neg, so overall answer is 0 as x > y
+	int diff_sign_x_is_neg = diff_sign & (x >> 31);
+
+	// if not diff (0), then use following to calculate result
+	int same_sign = !diff_sign & !((y + (~x + 1)) >> 31);
+
+	return diff_sign_x_is_neg | same_sign;
 }
 
 //4
