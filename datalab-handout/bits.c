@@ -13,6 +13,7 @@
  * case it's OK.  
  */
 
+#include <float.h>
 #include <stdint.h>
 #include <stdio.h>
 #if 0
@@ -315,7 +316,7 @@ int isLessOrEqual(int x, int y)
  */
 int logicalNeg(int x)
 {
-	return 2;
+	return ((x >> 31) | (~x + 1) >> 31) + 1;
 }
 
 /* howManyBits - return the minimum number of bits required to represent x in
@@ -349,7 +350,34 @@ int howManyBits(int x)
  */
 unsigned floatScale2(unsigned uf)
 {
-	return 2;
+	// (-1)^s * M * 2^E
+	// s - 1 bit
+	// e - 8 bit
+	// M - 23 bit
+	// 首先排除无穷小、0、无穷大和非数值NaN，
+	// 此时浮点数指数部分（真正指数+bias）分别存储的的为0，0，,255，255。
+	// 这些情况，无穷大和NaN都只需要返回参数
+	// 无穷小和0只需要将原数乘二再加上符号位就行了（并不会越界）。
+	// 剩下的情况，如果指数+1之后为指数为255则返回原符号无穷大，
+	// 否则返回指数+1之后的原符号数。
+
+	int sign = uf & (0x1 << 31);
+	int exp = (0x7F800000 & uf) >> 23;
+	if (exp == 0)
+	{
+		return uf << 1 | sign;
+	}
+	if (exp == 255)
+	{
+		return uf;
+	}
+	exp++;
+	if (exp == 255)
+	{
+		return 0x7F800000 | sign;
+	}
+
+	return (exp << 23) | (uf & 0x807FFFFF);
 }
 
 /*
@@ -366,7 +394,39 @@ unsigned floatScale2(unsigned uf)
  */
 int floatFloat2Int(unsigned uf)
 {
-	return 2;
+	// the question is asking to get the int part of the float
+	int sign = (1 << 31) & uf;
+	unsigned exp = (0x7F800000 & uf) >> 23;
+
+	int E = exp - 127;
+
+	if (E < 0)
+	{
+		return 0;
+	}
+
+	if (E >= 31)
+	{
+		return 0x80000000u;
+	}
+
+	unsigned frac = uf & 0x7FFFFF;
+	frac = frac | 1 << 23;
+	if (E < 23)
+	{
+		frac = frac >> (23 - E);
+	} else
+	{
+		frac = frac << (E - 23);
+	}
+
+	if (sign)
+	{
+		return -frac;
+	} else
+	{
+		return frac;
+	}
 }
 
 /*
